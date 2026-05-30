@@ -1,0 +1,39 @@
+﻿# Dependencies
+/vendor/
+/vendor++/
+
+# Runtime and cache
+/var/
+/frontend/runtime/
+/api/runtime/
+/backend/runtime/
+
+# Credentials - NEVER commit these
+/common/config/main-local.php
+/frontend/config/main-local.php
+/backend/config/main-local.php
+/api/config/main-local.php
+/console/config/main-local.php
+*.env
+.env
+/common/config/params-local.php
+
+# Uploads and user data
+/frontend/web/uploads/
+/frontend/uploads/media/
+/common/vault/
+/frontend/vault/
+
+# IDE
+/.idea/
+/.git/
+
+# Build artifacts
+/phpci.yml
+/index-test.php
+/admin/index-test.php
+/api/web/index-test.php
+
+# OS files
+Thumbs.db
+.DS_Store

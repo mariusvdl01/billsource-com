@@ -1,0 +1,54 @@
+#bill_entry {
+	background: url("../images/content_hr.png") repeat-x bottom; margin: 0px 0px 20px 20px; width: 714px; color: rgb(47, 90, 118); padding-bottom: 6px; float: left;
+}
+#bill_entry .col {
+	width: 226px; margin-right: 15px; float: left;
+}
+#bill_entry .col_last {
+	width: 226px; float: left;
+}
+#bill_entry .col_long {
+	margin: 0px 15px 15px 0px; width: 464px; float: left;
+}
+#bill_entry .col_long input {
+	width: 444px; margin-bottom: 4px; float: left;
+}
+#bill_entry b {
+	font: bold 14px/150% arial, helvetica, sans-serif; font-size-adjust: none; font-stretch: normal;
+}
+div.errmsg {
+	background: rgb(221, 221, 221); text-align: center; margin-top: 1px; margin-bottom: 1px;
+}
+div.errmsg p {
+	background: rgb(221, 221, 221); color: red; margin-top: 0pt; margin-bottom: 1pt;
+}
+#bill_entry .input {
+	font: 14px/normal arial, helvetica, sans-serif; margin: 6px 0px 15px; padding: 4px 8px; border-radius: 3px; border: 1px solid rgb(199, 208, 214); width: 206px; height: 22px; color: rgb(102, 102, 102); font-size-adjust: none; font-stretch: normal; box-shadow: inset 2px 1px 4px 0px #ebebeb; -moz-border-radius: 3px 3px 3px 3px; -webkit-border-radius: 3px 3px 3px 3px; -moz-box-shadow: inset 2px 1px 4px 0px #ebebeb; -webkit-box-shadow: inset 2px 1px 4px 0px #ebebeb;
+}
+#bill_entry .large.input {
+	padding: 4px 8px; height: 60px;
+}
+#bill_entry textarea {
+	font: 14px/normal arial, helvetica, sans-serif; margin: 6px 0px 15px; padding: 8px; border-radius: 3px; border: 1px solid rgb(199, 208, 214); width: 206px; height: 100px; color: rgb(102, 102, 102); font-size-adjust: none; font-stretch: normal; box-shadow: inset 2px 1px 4px 0px #ebebeb; -moz-border-radius: 3px 3px 3px 3px; -webkit-border-radius: 3px 3px 3px 3px; -moz-box-shadow: inset 2px 1px 4px 0px #ebebeb; -webkit-box-shadow: inset 2px 1px 4px 0px #ebebeb;
+}
+#bill_entry .button {
+	background: url("../images/btn_link_bg.jpg") repeat-x rgb(129, 155, 173); margin: 27px 5px 20px 0px; padding: 0px 12px 3px 10px; border-radius: 4px; border: currentColor; width: 85px; height: 30px; color: rgb(255, 255, 255); float: left; -moz-border-radius: 4px 4px 4px 4px; -webkit-border-radius: 4px 4px 4px 4px;
+}
+#bill_entry .buttonds {
+	background: url("../images/btn_link_ds.jpg") repeat-x rgb(129, 155, 173); margin: 27px 5px 20px 0px; padding: 0px 12px 3px 10px; border-radius: 4px; border: currentColor; width: 85px; height: 30px; color: rgb(255, 255, 255); float: left; -moz-border-radius: 4px 4px 4px 4px; -webkit-border-radius: 4px 4px 4px 4px;
+}
+#bill_entry .button:hover {
+	background: url("../images/btn_hover_bg.jpg") repeat-x rgb(69, 107, 130); cursor: pointer;
+}
+#bill_entry .submit {
+	background: url("../images/payment_link_bg.jpg") repeat-x rgb(129, 155, 173); margin: 22px 5px 20px 0px; padding: 9px 13px; border-radius: 4px; border: currentColor; color: rgb(255, 255, 255); font-weight: bold; float: right; -moz-border-radius: 4px 4px 4px 4px; -webkit-border-radius: 4px 4px 4px 4px;
+}
+#bill_entry .submit:hover {
+	background: url("../images/payment_hover_bg.jpg") repeat-x rgb(69, 107, 130);
+}
+#bill_data .button {
+	background: url("../images/payment_link_bg.jpg") repeat-x rgb(129, 155, 173); margin: 22px 5px 20px 0px; padding: 9px 13px; border-radius: 4px; border: currentColor; color: rgb(255, 255, 255); font-weight: bold; float: right; -moz-border-radius: 4px 4px 4px 4px; -webkit-border-radius: 4px 4px 4px 4px;
+}
+#bill_data .button:hover {
+	background: url("../images/payment_hover_bg.jpg") repeat-x rgb(69, 107, 130);
+}
