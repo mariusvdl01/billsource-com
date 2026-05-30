@@ -63,17 +63,8 @@ class BaseController extends Controller
     /** @var Session */
     protected $session;
 
-    /**
-     * PHP 8.2 fix: $request must be public to match yii\base\Controller visibility
-     * @var Request
-     */
-    public $request;
-
-    /**
-     * PHP 8.2 fix: $response must be public to match yii\base\Controller visibility
-     * @var Response
-     */
-    public $response;
+    // $request and $response are inherited from yii\base\Controller as public properties
+    // Do NOT redeclare them here — Yii2 DI injects them via init()
 
     /** @var AuditTrail */
     protected $audit;
