@@ -54,10 +54,10 @@
             "type": "package",
             "package": {
                 "name": "bower-asset/yii2-pjax",
-                "version": "2.0.1",
+                "version": "2.0.8",
                 "type": "bower-asset",
                 "dist": {
-                    "url": "https://github.com/yiisoft/jquery-pjax/archive/refs/tags/2.0.1.zip",
+                    "url": "https://github.com/yiisoft/jquery-pjax/archive/refs/tags/2.0.8.zip",
                     "type": "zip"
                 }
             }
