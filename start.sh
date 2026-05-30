@@ -72,13 +72,17 @@ PHPEOF
     fi
 done
 
-# Generate params-local.php
-if [ -d "/var/www/html/common/config" ]; then
-    cat > /var/www/html/common/config/params-local.php << 'PHPEOF'
+# Generate params-local.php for all config directories that need it
+for DIR in common frontend backend api console; do
+    CONFIG_DIR="/var/www/html/${DIR}/config"
+    if [ -d "$CONFIG_DIR" ]; then
+        cat > "${CONFIG_DIR}/params-local.php" << 'PHPEOF'
 <?php
 return [];
 PHPEOF
-fi
+        echo "Generated ${CONFIG_DIR}/params-local.php"
+    fi
+done
 
 # Fix Apache MPM conflict at runtime
 a2dismod mpm_event mpm_worker 2>/dev/null || true
