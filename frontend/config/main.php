@@ -13,7 +13,7 @@ return [
     'id' => 'app-frontend',
     'name' => 'Billsource',
     'basePath' => dirname(__DIR__),
-    'bootstrap' => ['log'],  // queue removed — Redis not yet provisioned on Railway
+    'bootstrap' => ['log'],
     'controllerNamespace' => 'frontend\controllers',
     'defaultRoute' => 'default',
     'components' => [
@@ -24,7 +24,8 @@ return [
             'identityCookie' => ['name' => '_identity-frontend', 'httpOnly' => true],
             'on afterLogin' => function ($event) {
                 $user = $event->identity;
-                if (method_exists($user, 'isTrialExpired') && $user->isTrialExpired() && !$user->client->is_subscribed) {
+                if (method_exists($user, 'isTrialExpired') && $user->isTrialExpired()
+                    && isset($user->client) && !$user->client->is_subscribed) {
                     Yii::$app->response->redirect(['/business/profile/upgrade'])->send();
                     Yii::$app->end();
                 }
@@ -79,15 +80,7 @@ return [
             'modelMap' => [
                 'User' => 'common\models\User',
             ],
-            'controllerMap' => [
-                'dashboard' => 'frontend\controllers\marketplace\AdminController',
-                'registration' => 'frontend\controllers\marketplace\RegistrationController',
-                'profile' => 'frontend\controllers\marketplace\ProfileController',
-                'recovery' => 'frontend\controllers\marketplace\RecoveryController',
-                'security' => 'frontend\controllers\marketplace\SecurityController',
-                'settings' => 'frontend\controllers\marketplace\SettingsController',
-                'marketplace' => 'frontend\controllers\MarketplaceController'
-            ],
+            // marketplace controllers removed — directory does not exist
         ],
     ],
     'params' => $params,
