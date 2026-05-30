@@ -41,6 +41,30 @@
         {
             "type": "package",
             "package": {
+                "name": "bower-asset/jquery-ui",
+                "version": "1.12.1",
+                "type": "bower-asset",
+                "dist": {
+                    "url": "https://github.com/jquery/jquery-ui/archive/refs/tags/1.12.1.zip",
+                    "type": "zip"
+                }
+            }
+        },
+        {
+            "type": "package",
+            "package": {
+                "name": "bower-asset/yii2-pjax",
+                "version": "2.0.1",
+                "type": "bower-asset",
+                "dist": {
+                    "url": "https://github.com/yiisoft/jquery-pjax/archive/refs/tags/2.0.1.zip",
+                    "type": "zip"
+                }
+            }
+        },
+        {
+            "type": "package",
+            "package": {
                 "name": "bower-asset/inputmask",
                 "version": "3.3.11",
                 "type": "bower-asset",
@@ -58,18 +82,6 @@
                 "type": "bower-asset",
                 "dist": {
                     "url": "https://github.com/bestiejs/punycode.js/archive/refs/tags/v1.3.2.zip",
-                    "type": "zip"
-                }
-            }
-        },
-        {
-            "type": "package",
-            "package": {
-                "name": "bower-asset/jquery-ui",
-                "version": "1.12.1",
-                "type": "bower-asset",
-                "dist": {
-                    "url": "https://github.com/jquery/jquery-ui/archive/refs/tags/1.12.1.zip",
                     "type": "zip"
                 }
             }
