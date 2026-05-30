@@ -2,7 +2,8 @@ FROM php:8.2-apache
 
 RUN apt-get update && apt-get install -y \
     git curl zip unzip libzip-dev libpng-dev libonig-dev \
-    && docker-php-ext-install pdo pdo_mysql zip mbstring gd
+    libicu-dev \
+    && docker-php-ext-install pdo pdo_mysql zip mbstring gd intl
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
@@ -15,14 +16,14 @@ RUN COMPOSER_ALLOW_SUPERUSER=1 composer update \
 
 COPY . .
 
-# Point Apache to Yii2 web/ folder
-RUN sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html/frontend/web|g' \
+# Point Apache to repo root (yii2-app-practical structure)
+RUN sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html|g' \
     /etc/apache2/sites-available/000-default.conf
 
 # Enable mod_rewrite for Yii2 pretty URLs
 RUN a2enmod rewrite
 
-# Fix MPM conflict — disable mpm_event, enable mpm_prefork (required for PHP)
+# Fix MPM conflict
 RUN a2dismod mpm_event mpm_worker || true \
     && a2enmod mpm_prefork
 
