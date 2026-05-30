@@ -1,4 +1,10 @@
 {
+    "repositories": [
+    {
+        "type": "composer",
+        "url": "https://asset-packagist.org"
+    }
+],
     "name": "yiisoft/yii2-app-advanced",
     "description": "Yii 2 Advanced Application Template",
     "keywords": ["yii2", "framework", "advanced", "application template"],
@@ -42,9 +48,8 @@
         "miloschuman/yii2-highcharts-widget": "*",
         "paypal/rest-api-sdk-php": "*",
         "drsdre/yii2-wizardwidget": "*",
-        "ricco/yii2-ticket": "1.0.7",
+        "ricco/yii2-ticket": "*",
         "yiisoft/yii2": "^2.0",
-        "netcraft-devops/payu-sdk-php": "*",
         "sjaakp/yii2-telex": "*",
         "dektrium/yii2-user": "^0.9.12",
         "thyseus/yii2-message": "^0.3.0",
