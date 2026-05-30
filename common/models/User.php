@@ -6,7 +6,6 @@ use common\models\bill\UserBillRequest;
 use common\models\business\BusinessClient;
 use common\models\business\BusinessClientCrm;
 use common\models\individual\IndividualClient;
-use common\traits\ActiveRecordTrait;
 use Yii;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
@@ -43,7 +42,6 @@ class User extends ActiveRecord implements IdentityInterface
     const TYPE_BUSINESS = 1;
     const TYPE_NOT_BUSINESS = 0;
 
-    use ActiveRecordTrait;
 
     /**
      * Provides the name of the table
