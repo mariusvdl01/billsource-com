@@ -7,22 +7,24 @@ RUN apt-get update && apt-get install -y \
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
-COPY . .
 
+# Copy composer files first for better cache layering
+COPY composer.json ./
+
+# Run composer - this layer re-runs whenever composer.json changes
 RUN COMPOSER_ALLOW_SUPERUSER=1 composer update \
     --no-dev --optimize-autoloader --no-scripts --no-interaction
 
-# Fix ENV format (legacy "ENV key value" → modern "ENV key=value")
+# Copy rest of application after composer
+COPY . .
+
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/web
 
-# Point Apache document root to Yii2's web/ folder
 RUN sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html/web|g' \
     /etc/apache2/sites-available/000-default.conf
 
-# Enable mod_rewrite for Yii2 pretty URLs
 RUN a2enmod rewrite
 
-# Allow .htaccess overrides
 RUN sed -i 's|AllowOverride None|AllowOverride All|g' \
     /etc/apache2/apache2.conf
 
