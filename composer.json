@@ -66,10 +66,10 @@
             "type": "package",
             "package": {
                 "name": "bower-asset/jquery-ui",
-                "version": "1.13.2",
+                "version": "1.12.1",
                 "type": "bower-asset",
                 "dist": {
-                    "url": "https://github.com/jquery/jquery-ui/archive/refs/tags/1.13.2.zip",
+                    "url": "https://github.com/jquery/jquery-ui/archive/refs/tags/1.12.1.zip",
                     "type": "zip"
                 }
             }
