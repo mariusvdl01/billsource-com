@@ -15,11 +15,18 @@ RUN COMPOSER_ALLOW_SUPERUSER=1 composer update \
 
 COPY . .
 
+# Point Apache to Yii2 web/ folder
 RUN sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html/web|g' \
     /etc/apache2/sites-available/000-default.conf
 
+# Enable mod_rewrite for Yii2 pretty URLs
 RUN a2enmod rewrite
 
+# Fix MPM conflict — disable mpm_event, enable mpm_prefork (required for PHP)
+RUN a2dismod mpm_event mpm_worker || true \
+    && a2enmod mpm_prefork
+
+# Allow .htaccess overrides
 RUN sed -i 's|AllowOverride None|AllowOverride All|g' \
     /etc/apache2/apache2.conf
 
