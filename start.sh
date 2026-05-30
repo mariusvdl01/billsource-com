@@ -81,15 +81,39 @@ PHPEOF
 fi
 
 # Fix Apache MPM conflict at runtime
-# Disable conflicting MPMs, enable prefork (required for mod_php)
 a2dismod mpm_event mpm_worker 2>/dev/null || true
 a2enmod mpm_prefork 2>/dev/null || true
 
-# Set Apache to listen on Railway's PORT
+# Fix redirect loop — write a clean vhost config that handles Railway's reverse proxy
 LISTEN_PORT="${PORT:-80}"
 echo "Configuring Apache on port ${LISTEN_PORT}"
+
+cat > /etc/apache2/sites-available/000-default.conf << APACHEEOF
+<VirtualHost *:${LISTEN_PORT}>
+    ServerAdmin webmaster@localhost
+    DocumentRoot /var/www/html/web
+
+    # Trust Railway's reverse proxy headers
+    SetEnvIf X-Forwarded-Proto https HTTPS=on
+
+    <Directory /var/www/html/web>
+        Options -Indexes +FollowSymLinks
+        AllowOverride All
+        Require all granted
+
+        # Prevent redirect loops from .htaccess rewrites
+        RewriteEngine On
+        RewriteCond %{REQUEST_FILENAME} !-f
+        RewriteCond %{REQUEST_FILENAME} !-d
+        RewriteRule . index.php [L]
+    </Directory>
+
+    ErrorLog \${APACHE_LOG_DIR}/error.log
+    CustomLog \${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
+APACHEEOF
+
 sed -i "s/Listen 80/Listen ${LISTEN_PORT}/" /etc/apache2/ports.conf
-sed -i "s/:80>/:${LISTEN_PORT}>/" /etc/apache2/sites-available/000-default.conf
 
 echo "Starting Apache..."
 exec apache2-foreground
