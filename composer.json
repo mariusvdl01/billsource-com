@@ -2,8 +2,7 @@
 "repositories": [
     {
         "type": "composer",
-        "url": "https://asset-packagist.org",
-        "only": ["bower-asset/", "npm-asset/"]
+        "url": "https://asset-packagist.org"
     }
 ],
 "config": {
