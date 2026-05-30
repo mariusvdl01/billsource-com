@@ -84,29 +84,20 @@ fi
 a2dismod mpm_event mpm_worker 2>/dev/null || true
 a2enmod mpm_prefork 2>/dev/null || true
 
-# Detect correct document root
-if [ -d "/var/www/html/web" ]; then
-    DOCROOT="/var/www/html/web"
-elif [ -d "/var/www/html/frontend/web" ]; then
-    DOCROOT="/var/www/html/frontend/web"
-else
-    DOCROOT="/var/www/html/frontend/web"
-fi
-echo "Using DocumentRoot: ${DOCROOT}"
-
 LISTEN_PORT="${PORT:-80}"
 echo "Configuring Apache on port ${LISTEN_PORT}"
 
+# yii2-app-practical: repo root IS the web root (index.php at /var/www/html/)
 cat > /etc/apache2/sites-available/000-default.conf << APACHEEOF
 ServerName billsource.railway.app
 
 <VirtualHost *:${LISTEN_PORT}>
     ServerAdmin webmaster@localhost
-    DocumentRoot ${DOCROOT}
+    DocumentRoot /var/www/html
 
     SetEnvIf X-Forwarded-Proto https HTTPS=on
 
-    <Directory ${DOCROOT}>
+    <Directory /var/www/html>
         Options -Indexes +FollowSymLinks
         AllowOverride All
         Require all granted
@@ -119,5 +110,5 @@ APACHEEOF
 
 sed -i "s/Listen 80/Listen ${LISTEN_PORT}/" /etc/apache2/ports.conf
 
-echo "Starting Apache on port ${LISTEN_PORT} with DocumentRoot ${DOCROOT}"
+echo "Starting Apache on port ${LISTEN_PORT} with DocumentRoot /var/www/html"
 exec apache2-foreground
