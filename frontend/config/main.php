@@ -1,8 +1,6 @@
 <?php
 
 use kartik\mpdf\Pdf;
-use yii\queue\LogBehavior;
-use yii\queue\redis\Queue;
 
 $params = array_merge(
     require(__DIR__ . '/../../common/config/params.php'),
@@ -15,22 +13,18 @@ return [
     'id' => 'app-frontend',
     'name' => 'Billsource',
     'basePath' => dirname(__DIR__),
-    'bootstrap' => ['log', 'queue'],
+    'bootstrap' => ['log'],  // queue removed — Redis not yet provisioned on Railway
     'controllerNamespace' => 'frontend\controllers',
     'defaultRoute' => 'default',
     'components' => [
-      'user' => [
-            'loginUrl' => ['account/login'],   // wrap in array, safer
-            'class' => promocat\twofa\User::class,
+        'user' => [
+            'loginUrl' => ['account/login'],
             'identityClass' => 'common\models\User',
             'enableAutoLogin' => true,
             'identityCookie' => ['name' => '_identity-frontend', 'httpOnly' => true],
-            // ✅ Use afterLogin, not beforeLogin
             'on afterLogin' => function ($event) {
                 $user = $event->identity;
-
-                if ($user->isTrialExpired() && !$user->client->is_subscribed) {
-                    // Force redirect to upgrade page after successful login
+                if (method_exists($user, 'isTrialExpired') && $user->isTrialExpired() && !$user->client->is_subscribed) {
                     Yii::$app->response->redirect(['/business/profile/upgrade'])->send();
                     Yii::$app->end();
                 }
@@ -62,38 +56,28 @@ return [
             'format' => Pdf::FORMAT_A4,
             'orientation' => Pdf::ORIENT_PORTRAIT,
             'destination' => Pdf::DEST_BROWSER,
-            'tempPath' => Yii::getAlias('@var') . '/runtime/pdf',
-            'cssFile' => Yii::getAlias('@frontend') . '/assets/invoice/css/style.css',
+            'tempPath' => dirname(dirname(__DIR__)) . '/var/runtime/pdf',
+            'cssFile' => dirname(__DIR__) . '/assets/invoice/css/style.css',
         ],
         'assetManager' => [
             'linkAssets' => false,
             'appendTimestamp' => false,
         ],
-        'queue' => [
-            'class' => Queue::class,
-            'as log' => LogBehavior::class,
-            'redis' => 'redis',
-            'channel' => 'queue',
-        ]
     ],
     'modules' => [
         'treemanager' => [
             'class' => '\kartik\tree\Module',
-            // other module settings, refer detailed documentation
         ],
         'gridview' => [
             'class' => '\kartik\grid\Module',
         ],
-        //'mobisite' => [
-        //    'class' => 'common\modules\mobisite\Mobisite',
-        //],
         'ticket' => [
             'class' => 'common\modules\ticket\Module',
         ],
         'user' => [
             'class' => 'dektrium\user\Module',
             'modelMap' => [
-                'User' => 'frontend\models\marketplace\users\User',
+                'User' => 'common\models\User',
             ],
             'controllerMap' => [
                 'dashboard' => 'frontend\controllers\marketplace\AdminController',
