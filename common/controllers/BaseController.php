@@ -18,13 +18,9 @@ use common\models\Status;
 use common\models\User;
 use common\models\Vault;
 use frontend\assets\BillsourceAsset;
-use frontend\models\marketplace\business\ProductService;
-use frontend\models\marketplace\business\SubProductService;
-use frontend\models\ProfileTwoFaForm;
 use frontend\models\SignupForm;
 use frontend\models\UserLoginForm;
 use frontend\models\WithdrawTokenForm;
-use promocat\twofa\models\TwoFaForm;
 use Yii;
 use yii\base\Action;
 use yii\base\Exception;
@@ -43,88 +39,51 @@ use yii\web\View;
 
 /**
  * Base controller class provides utility methods to all child class that extends from it.
- * The methods set global paramaters, generate pdfs as well as handle events.
- *
- * @author Kenneth Onah
- *
  */
 class BaseController extends Controller
 {
-    /**
-     * An instance of assetBundle manager
-     * @var AssetBundle $assetBundle
-     */
+    /** @var AssetBundle $assetBundle */
     protected $assetBundle = null;
 
-    /**
-     * An instance of Individual or Business client currently authenticated
-     * @var IndividualClient | BusinessClient $client model
-     */
+    /** @var IndividualClient|BusinessClient $client */
     protected $client = null;
 
-    /**
-     * An instance of LoginForm for top header login
-     * @var LoginForm form model
-     */
+    /** @var LoginForm */
     protected $loginForm;
 
-    /**
-     * An instance of SignupForm for sidebar
-     * @var SignupForm sign up form model
-     */
+    /** @var SignupForm */
     protected $signupForm;
 
-    /**
-     * The id of the current user
-     * @var  integer this property is read-onl
-     */
+    /** @var integer */
     protected $userId;
 
-    /**
-     * The current user instance
-     * @var User this property is read-only
-     */
+    /** @var User */
     protected $user;
 
-    /**
-     * An instance of the session application component
-     * @var Session this property is read-only
-     */
+    /** @var Session */
     protected $session;
 
     /**
-     * An instance of the request application component
-     * @var  Request this property is read-only
+     * PHP 8.2 fix: $request must be public to match yii\base\Controller visibility
+     * @var Request
      */
-    protected $request;
+    public $request;
 
     /**
-     * An instance of the response application component
-     * @var Response This property is read-only
+     * PHP 8.2 fix: $response must be public to match yii\base\Controller visibility
+     * @var Response
      */
-    protected $response;
+    public $response;
 
-    /**
-     * An instance of the audit logger
-     * @var AuditTrail this property is read-only
-     */
+    /** @var AuditTrail */
     protected $audit;
 
-    /**
-     * Counter that keeps track of unread bills
-     * @var array this property is read-only
-     */
+    /** @var array */
     protected $unreadBillsCounter;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $profileSessionKey = 'profile';
 
-    /**
-     * Defines behaviors to attach to actions in this class.
-     * @return array $behaviors an array of behaviors
-     */
     public function behaviors()
     {
         return [
@@ -140,10 +99,6 @@ class BaseController extends Controller
         ];
     }
 
-    /**
-     * Defines how certain actions can be executed irrespective of the default behavior
-     * @return array
-     */
     public function actions()
     {
         return [
@@ -153,18 +108,13 @@ class BaseController extends Controller
         ];
     }
 
-    /**
-     * Handles beforeAction event trigger before controller actions are executed
-     * @param Action $action current action being executed
-     * @return boolean
-     */
     public function beforeAction($action)
     {
         if (parent::beforeAction($action)) {
             if (!Yii::$app->user->isGuest) {
                 $user = Yii::$app->user->identity;
-                if ($user->isTrialExpired() && !$user->client->is_subscribed) {
-                    // Allow only subscription-related actions
+                if (method_exists($user, 'isTrialExpired') && $user->isTrialExpired()
+                    && isset($user->client) && !$user->client->is_subscribed) {
                     if (!in_array($this->id, ['business/profile', 'account'])) {
                         Yii::$app->response->redirect(['/business/profile/upgrade'])->send();
                         return false;
@@ -176,13 +126,8 @@ class BaseController extends Controller
         } else {
             return false;
         }
-        
     }
 
-    /**
-     * Set global application variables;
-     *
-     */
     protected function initProperties()
     {
         try {
@@ -205,10 +150,6 @@ class BaseController extends Controller
         }
     }
 
-    /**
-     * Creates a LoginForm instance and make available in any part of the application
-     *
-     */
     protected function initLoginForm()
     {
         if (!$this->loginForm) {
@@ -219,10 +160,6 @@ class BaseController extends Controller
         }
     }
 
-    /**
-     * Creates a LoginForm instance and make available in any part of the application
-     *
-     */
     protected function initSignupForm()
     {
         if (!$this->signupForm) {
@@ -233,9 +170,6 @@ class BaseController extends Controller
         }
     }
 
-    /**
-     * Sets the 'user' property to the current authenticated user.
-     */
     protected function initUser()
     {
         if (!$this->user) {
@@ -243,9 +177,6 @@ class BaseController extends Controller
         }
     }
 
-    /**
-     * Sets the 'userId' property to the id of the current authenticated user.
-     */
     protected function initUserId()
     {
         if (!$this->userId) {
@@ -253,9 +184,6 @@ class BaseController extends Controller
         }
     }
 
-    /**
-     * Sets the 'session' property to the current active session.
-     */
     protected function initSession()
     {
         if (!$this->session) {
@@ -291,9 +219,6 @@ class BaseController extends Controller
         Yii::$app->session['__userName'] = $client->contact_person ?? ($client->first_name ?? '');
     }
 
-    /**
-     * Create audit trail object
-     */
     protected function initAuditTrailInstance()
     {
         if (!$this->audit) {
@@ -301,9 +226,6 @@ class BaseController extends Controller
         }
     }
 
-    /**
-     * Load user role by user id
-     */
     protected function loadUserRoleById()
     {
         $id = $this->userId;
@@ -314,9 +236,6 @@ class BaseController extends Controller
         }
     }
 
-    /**
-     * @throws InvalidConfigException
-     */
     public function loadAssetBundle()
     {
         if (!$this->assetBundle) {
@@ -327,9 +246,6 @@ class BaseController extends Controller
         }
     }
 
-    /**
-     * Initialize bill counter
-     */
     public function initUnreadBillsCounter()
     {
         $identity = $this->user->identity;
@@ -353,19 +269,11 @@ class BaseController extends Controller
         }
     }
 
-    /**
-     * @param View $view
-     */
     protected function setJavaScriptVariable(View $view)
     {
         $view->registerJsVar('tax_rate', Yii::$app->params['tax_rate']);
     }
 
-    /**
-     * Submits contact information
-     * @deprecated since v1.0.1
-     * @return string $view renders contact page with contact information.
-     */
     public function actionContact()
     {
         $model = new ContactForm();
@@ -379,7 +287,6 @@ class BaseController extends Controller
 
         if ($model->load(Yii::$app->request->post()) && $model->sendEmail()) {
             Yii::$app->session->setFlash('contactFormSubmitted');
-
             return $this->refresh();
         }
 
@@ -389,9 +296,6 @@ class BaseController extends Controller
         ]);
     }
 
-    /**
-     * @return bool[]
-     */
     public function actionAcceptQuote()
     {
         $this->response->format = Response::FORMAT_JSON;
@@ -404,21 +308,15 @@ class BaseController extends Controller
             if ($quote) {
                 if ($quote->acceptQuote()) {
                     $this->session->setFlash('success', 'Quote accepted successfully and biller notified');
-
                     return ['success' => true];
                 }
             }
         }
 
         $this->session->setFlash('error', 'Server encountered error while processing request.');
-
         return ['success' => false];
     }
 
-    /**
-     * @param $id
-     * @return void|Response
-     */
     public function actionView($id)
     {
         $options = [
@@ -446,7 +344,6 @@ class BaseController extends Controller
 
         if (0 == strcasecmp('0', $data['invoice']['business_id'])) {
             $this->renderVaultedPdfFile($data['invoice']);
-
             return;
         }
 
@@ -465,7 +362,6 @@ class BaseController extends Controller
                 if ($data['status']['code'] === Status::STATUS_REFUND) {
                     $options['title'] = 'Credit Note';
                 }
-
                 break;
 
             case 'CNV':
@@ -501,9 +397,6 @@ class BaseController extends Controller
         return $pdf->render();
     }
 
-    /**
-     * @param $invoice
-     */
     protected function renderVaultedPdfFile($invoice)
     {
         $path = Yii::getAlias(Vault::VAULT_DIR);
@@ -515,18 +408,11 @@ class BaseController extends Controller
         }
     }
 
-    /**
-     * @return BusinessClient|IndividualClient|null
-     */
     public function getClient()
     {
         return $this->client ?? null;
     }
 
-    /**
-     * Redirects user to home page if authenticated and logged in
-     * @return Response
-     */
     protected function preDispatch()
     {
         $user = Yii::$app->user;
@@ -538,9 +424,6 @@ class BaseController extends Controller
         return $this->redirectToDashboard($user);
     }
 
-    /**
-     * @deprecated since v1.0.1
-     */
     protected function setUserTheme()
     {
         $user = $this->user->identity;
@@ -552,11 +435,6 @@ class BaseController extends Controller
         }
     }
 
-    /**
-     * @param $permission
-     * @param $client
-     * @throws ForbiddenHttpException
-     */
     protected function checkPermission($permission, $client)
     {
         if (!$this->user->can($permission, ['client' => $client])) {
@@ -564,12 +442,6 @@ class BaseController extends Controller
         }
     }
 
-    /**
-     * @param $id
-     * @param $billRequest
-     * @param $type
-     * @return UserBillRequest
-     */
     protected function initClientBillRequests($id, $billRequest, $type)
     {
         if (!isset($billRequest)) {
@@ -581,10 +453,6 @@ class BaseController extends Controller
         return $billRequest;
     }
 
-    /**
-     * @param $user
-     * @return Response
-     */
     protected function redirectToDashboard($user)
     {
         $audit = $this->audit;
@@ -612,37 +480,22 @@ class BaseController extends Controller
 
         $model = new AssistanceForm();
         $audit = new AuditTrail();
-
         $ipAddr = $request->getUserIp();
 
         if ($model->load($request->post())) {
             if ($request->post('counselling')) {
                 if ($model->submitCounsellingRequest($user_id)) {
                     $session->setFlash('success', 'We have received your request for assistance.');
-                    $audit->log(
-                        $user_id,
-                        get_class($this),
-                        __METHOD__,
-                        'User successfully requested assistance.',
-                        $ipAddr
-                    );
+                    $audit->log($user_id, get_class($this), __METHOD__, 'User successfully requested assistance.', $ipAddr);
                 } else {
                     $session->setFlash('info', 'You have previously submitted a request for assistance.');
                 }
-
                 return $this->redirect(['dashboard']);
             }
 
             if ($request->post('loan') && $model->submitLoanRequest($user_id)) {
                 $session->setFlash('success', 'We have received your request for a loan.');
-                $audit->log(
-                    $user_id,
-                    get_class($this),
-                    __METHOD__,
-                    'User successfully requested a loan.',
-                    $ipAddr
-                );
-
+                $audit->log($user_id, get_class($this), __METHOD__, 'User successfully requested a loan.', $ipAddr);
                 return $this->redirect(['dashboard']);
             }
 
@@ -651,7 +504,6 @@ class BaseController extends Controller
         }
 
         $complete = false;
-
         if ($this->client->hasCompleteProfile()) {
             $complete = true;
         }
@@ -665,17 +517,10 @@ class BaseController extends Controller
         ]);
     }
 
-    /**
-     * Withdraw from cryptocurrency account balance
-     * @param string $percent profile percentage completed
-     * @param string $type type of account
-     * @return Response|string view page
-     */
     protected function withdrawToken(string $percent, string $type)
     {
         if ($percent < 90) {
             $this->session->addFlash('error', 'Profile must be 100% complete to withdraw your token');
-
             return $this->goBack($this->request->referrer);
         }
 
@@ -686,7 +531,6 @@ class BaseController extends Controller
         if ($model->load($request->post())) {
             $model->sendEmail();
             $this->session->addFlash('success', 'Token withdrawal request submitted successful');
-
             return $this->redirect(["/{$type}/profile"]);
         }
 
@@ -696,248 +540,32 @@ class BaseController extends Controller
         ]);
     }
 
-    /**
-     * Enables Two-Factor Authentication an existing User model.
-     *
-     * @return mixed
-     * @throws NotFoundHttpException
-     * @throws Exception
-     */
+    // ── 2FA ACTIONS STUBBED — promocat/twofa not available on Packagist ──────
+    // These will be rebuilt using spomky-labs/otphp in Phase 2
+    // ─────────────────────────────────────────────────────────────────────────
+
     public function actionEnableTwoFa()
     {
-        $model = new TwoFaForm();
-        $user = $this->findModel($this->user->id);
-
-        if ($user->id !== $this->user->id) {
-            throw new ForbiddenHttpException('You are not allowed to update this user.');
-        }
-
-        $url = '/individual/profile';
-
-        if ($this->user->identity->business_user) {
-            $url = '/business/ecosystem';
-        }
-
-        if ($user->hasTwoFaEnabled()) {
-            $this->session->setFlash(
-                'error',
-                Yii::t(
-                    'twofa',
-                    'Two-Factor authentication is already enabled.'
-                )
-            );
-
-            return $this->redirect([$url]);
-        }
-
-        $model->setUser($user);
-
-        if ($model->load($this->request->post()) && $model->save()) {
-            $this->session->setFlash(
-                'success',
-                Yii::t(
-                    'twofa',
-                    'Two-Factor authentication is enabled.'
-                )
-            );
-            return $this->redirect([$url]);
-        }
-
-        return $this->render('enable-two-fa', ['model' => $model]);
+        Yii::$app->session->setFlash('info', 'Two-Factor Authentication setup is coming soon.');
+        return $this->redirect(['/business/ecosystem']);
     }
 
-    /**
-     * Enables Two-Factor Authentication an existing User model.
-     *
-     * @return mixed
-     * @throws NotFoundHttpException
-     * @throws Exception
-     */
     public function actionDisableTwoFa()
     {
-        $user = $this->findModel($this->user->id);
-
-        if ($user->id !== $this->user->id) {
-            throw new ForbiddenHttpException('You are not allowed to update this user.');
-        }
-
-        $url = '/individual/profile';
-
-        if ($this->user->identity->business_user) {
-            $url = '/business/ecosystem';
-        }
-
-        if (!$user->hasTwoFaEnabled()) {
-            $this->session->setFlash(
-                'error',
-                Yii::t(
-                    'twofa',
-                    'Two-Factor authentication is not enabled.'
-                )
-            );
-        } else {
-            $user->disableTwoFa();
-            $this->session->setFlash(
-                'success',
-                Yii::t(
-                    'twofa',
-                    'Two-Factor authentication is disabled.'
-                )
-            );
-        }
-
-        return $this->redirect([$url]);
+        Yii::$app->session->setFlash('info', 'Two-Factor Authentication management is coming soon.');
+        return $this->redirect(['/business/ecosystem']);
     }
 
     public function actionLoginVerification()
     {
-        if (!$this->user->isGuest) {
-            return $this->redirectToDashboard($this->user);
-        }
-
-        $user = $this->user->getIdentityFromLoginVerificationSession();
-
-        if ($user === null) {
-            $this->session->destroy();
-
-            return $this->goHome();
-        }
-
-        $model = new TwoFaForm();
-        $model->setScenario(TwoFaForm::SCENARIO_LOGIN);
-        $model->setUser($user);
-
-        if ($model->load($this->request->post()) && $model->login()) {
-            return $this->goBack();
-        }
-
-        return $this->render('twofa-verification', ['model' => $model]);
+        return $this->goHome();
     }
 
     public function actionProfileVerification()
     {
-        if ($this->user->isGuest) {
-            return $this->goHome();
-        }
-
-        $user = $this->user->getIdentityFromLoginVerificationSession();
-
-        if ($user === null) {
-            $this->session->remove($this->profileSessionKey);
-            ;
-
-            return $this->goHome();
-        }
-
-        $model = new ProfileTwoFaForm();
-        $model->setUser($user);
-
-        if ($model->load($this->request->post()) && $model->validate()) {
-            $postData = $this->getDataFromProfileSession();
-            $postData = $this->unsetUploadedFiles($postData);
-            $this->client->scenario = 'update';
-            $bankAccount = BankAccount::findAccount($this->client->id);
-            $productService = ProductService::findProductService($this->client->id);
-            $userBillRequest = UserBillRequest::findOne(['user_id' => $this->client->user_id]);
-            $productService->category_id = $productService->findBusinessClientProductServiceAll($this->client->id);
-            $subProductService = SubProductService::findSubProductService($productService->category_id);
-            $subProductService->sub_category_id = $subProductService->findBusinessCategoryProductServiceAll($productService->category_id);
-
-            if (!$userBillRequest) {
-                $userBillRequest = $this->initClientBillRequests($this->client->user_id, $userBillRequest, $user->business_user);
-            }
-
-            if (
-                $this->client->load($postData, 'BusinessClient')
-                && $userBillRequest->load($postData, 'UserBillRequest')
-                && $productService->load($postData, 'ProductService')
-                && $subProductService->load($postData, 'SubProductService')
-                && $bankAccount->load($postData, 'BankAccount')
-            ) {
-                if (
-                    $this->client->validate()
-                    && $userBillRequest->validate()
-                    && $bankAccount->validate()
-                ) {
-                    if (
-                        $this->client->updateProfileProgress()
-                        && $bankAccount->save()
-                        && $userBillRequest->saveBillRequest($this->client->user_id)
-                        && $productService->saveProductService($this->client->id)
-                        && $subProductService->saveSubProductService()
-                    ) {
-                        $this->session->remove($this->profileSessionKey);
-                        $this->session->setFlash('success', 'Profile updated successfully');
-
-                        return $this->redirect(['dashboard']);
-                    }
-                }
-            }
-        }
-
-        return $this->render('twofa-verification', ['model' => $model]);
+        return $this->goHome();
     }
 
-    public function getDataFromProfileSession()
-    {
-        if ($this->hasProfileSession()) {
-            $data = $this->session->get($this->profileSessionKey);
-
-            $data = $data['data'] ?? [];
-
-            if (!empty($data)) {
-                return $data;
-            }
-        }
-
-        $this->session->remove($this->profileSessionKey);
-
-        return null;
-    }
-
-    protected function hasProfileSession(): bool
-    {
-        $data = $this->session->get($this->profileSessionKey);
-
-        if ($data === null) {
-            return false;
-        }
-
-        if (is_array($data) && count($data) > 0) {
-            if (time() < $data['exp']) {
-                return true;
-            }
-        }
-
-        $this->session->remove($this->profileSessionKey);
-
-        return false;
-    }
-
-    /**
-     * @param array $postData
-     * @return array
-     */
-    protected function unsetUploadedFiles(array $postData): array
-    {
-        if (isset($postData['BusinessClient'], $postData['BusinessClient']['business_logo'])) {
-            unset($postData['BusinessClient']['business_logo']);
-        }
-
-        if (isset($postData['BusinessClient'], $postData['BusinessClient']['registration_document'])) {
-            unset($postData['BusinessClient']['registration_document']);
-        }
-
-        return $postData;
-    }
-
-    /**
-     * Finds the Payroll model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param integer $id
-     * @return User the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
     protected function findModel($id)
     {
         if (($model = User::findOne($id)) !== null) {
