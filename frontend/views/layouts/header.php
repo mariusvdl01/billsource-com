@@ -5,12 +5,12 @@ use yii\helpers\Html;
 use yii\bootstrap\ActiveForm;
 
 $topForm = Yii::$app->params['model'];
-$lastLogin = explode(' ', Yii::$app->session['__last_login']);
+$lastLogin = explode(' ', Yii::$app->session['__last_login'] ?? '');
 ?>
         <?php if(!Yii::$app->user->isGuest) : ?>
         	<div class="nav navbar-form navbar-right hidden-xs hidden-sm header">
             	<span>Welcome (<?= Yii::$app->session['__userName'] ?>)</span> |
-            	<span class="text-right">Last login: <?= $lastLogin[0] ?></span> |
+            	<span class="text-right">Last login: <?= $lastLogin[0] ?? '' ?></span> |
             	<a href="<?= Url::to(['/account/logout']) ?>" data-method="post" class="header">Logout</a>
             </div>
         <?php else : ?>
