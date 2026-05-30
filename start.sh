@@ -39,6 +39,9 @@ return [
                 ],
             ],
         ],
+        'request' => [
+            'cookieValidationKey' => getenv('COOKIE_VALIDATION_KEY') ?: 'billsource2026securekey_changethis',
+        ],
         'cache' => [
             'class' => 'yii\caching\FileCache',
         ],
