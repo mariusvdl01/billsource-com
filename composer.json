@@ -207,8 +207,7 @@
         "dektrium/yii2-user": "^0.9.12",
         "thyseus/yii2-message": "^0.3.0",
         "nterms/yii2-mailqueue": "*",
-        "composer/installers": "^2.0",
-        "oomphinc/composer-installers-extender": "^2.0"
+        "composer/installers": "^2.0"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "*",
