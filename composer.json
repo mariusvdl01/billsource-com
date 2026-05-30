@@ -1,10 +1,17 @@
 {
-    "repositories": [
+"repositories": [
     {
         "type": "composer",
-        "url": "https://asset-packagist.org"
+        "url": "https://asset-packagist.org",
+        "only": ["bower-asset/", "npm-asset/"]
     }
 ],
+"config": {
+    "allow-plugins": {
+        "yiisoft/yii2-composer": true,
+        "fxp/composer-asset-plugin": true
+    }
+},
     "name": "yiisoft/yii2-app-advanced",
     "description": "Yii 2 Advanced Application Template",
     "keywords": ["yii2", "framework", "advanced", "application template"],
