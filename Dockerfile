@@ -16,10 +16,6 @@ RUN COMPOSER_ALLOW_SUPERUSER=1 composer update \
 
 COPY . .
 
-# Point Apache to repo root (yii2-app-practical structure)
-RUN sed -i 's|DocumentRoot /var/www/html|DocumentRoot /var/www/html|g' \
-    /etc/apache2/sites-available/000-default.conf
-
 # Enable mod_rewrite for Yii2 pretty URLs
 RUN a2enmod rewrite
 
@@ -30,6 +26,23 @@ RUN a2dismod mpm_event mpm_worker || true \
 # Allow .htaccess overrides
 RUN sed -i 's|AllowOverride None|AllowOverride All|g' \
     /etc/apache2/apache2.conf
+
+# Fix bower asset directory names
+# Composer downloads our inline packages as zip archives named e.g. jquery-dist-3.7.1
+# Yii2 asset manager expects vendor/bower/jquery — create symlinks
+RUN echo "=== Bower dir contents ===" && ls /var/www/html/vendor/bower/ && \
+    cd /var/www/html/vendor/bower && \
+    for dir in */; do \
+        dir="${dir%/}"; \
+        # Strip trailing version e.g. jquery-dist-3.7.1 -> jquery-dist, then jquery
+        plain=$(echo "$dir" | sed 's/-[0-9][0-9.]*$//'); \
+        plain=$(echo "$plain" | sed 's/-dist$//'); \
+        if [ "$plain" != "$dir" ] && [ ! -e "$plain" ]; then \
+            ln -sfn "$dir" "$plain"; \
+            echo "Linked: $dir -> $plain"; \
+        fi; \
+    done && \
+    echo "=== After linking ===" && ls /var/www/html/vendor/bower/
 
 # Fix directory permissions for Apache (www-data)
 RUN mkdir -p /var/www/html/assets \
