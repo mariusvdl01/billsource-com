@@ -16,23 +16,23 @@ RUN COMPOSER_ALLOW_SUPERUSER=1 composer update \
     --no-dev --optimize-autoloader --no-scripts --no-interaction
 
 # Fix bower asset directory names immediately after composer runs
-# Composer downloads zips named e.g. jquery-dist-3.7.1/ but Yii2 expects jquery/
+# composer/installers routes bower-asset/* to vendor/bower/{name}/
+# But zip extraction may add version suffix — create symlinks to plain names
 RUN echo "=== Bower contents after composer ===" && \
-    ls /var/www/html/vendor/bower/ 2>/dev/null || echo "vendor/bower not found!" && \
-    if [ -d /var/www/html/vendor/bower ]; then \
-        cd /var/www/html/vendor/bower && \
-        for dir in */; do \
-            dir="${dir%/}"; \
-            plain=$(echo "$dir" | sed 's/-[0-9][0-9.]*$//'); \
-            plain=$(echo "$plain" | sed 's/-dist$//'); \
-            if [ "$plain" != "$dir" ] && [ ! -e "$plain" ]; then \
-                ln -sfn "$dir" "$plain"; \
-                echo "Linked: $dir -> $plain"; \
-            fi; \
-        done; \
-    fi && \
+    ls /var/www/html/vendor/bower/ 2>/dev/null || echo "vendor/bower not found - will be created" ; \
+    mkdir -p /var/www/html/vendor/bower && \
+    cd /var/www/html/vendor/bower && \
+    for dir in */; do \
+        dir="${dir%/}"; \
+        plain=$(echo "$dir" | sed 's/-[0-9][0-9.]*$//'); \
+        plain=$(echo "$plain" | sed 's/-dist$//'); \
+        if [ "$plain" != "$dir" ] && [ ! -e "$plain" ]; then \
+            ln -sfn "$dir" "$plain"; \
+            echo "Linked: $dir -> $plain"; \
+        fi; \
+    done ; \
     echo "=== Bower contents after linking ===" && \
-    ls /var/www/html/vendor/bower/ 2>/dev/null
+    ls /var/www/html/vendor/bower/ 2>/dev/null || true
 
 COPY . .
 

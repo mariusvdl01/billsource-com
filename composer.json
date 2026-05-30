@@ -222,6 +222,11 @@
         }
     },
     "extra": {
+        "installer-paths": {
+            "vendor/bower/{$name}": [
+                "type:bower-asset"
+            ]
+        },
         "asset-installer-paths": {
             "npm-asset-library": "vendor/npm",
             "bower-asset-library": "vendor/bower"
