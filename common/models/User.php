@@ -7,7 +7,6 @@ use common\models\business\BusinessClient;
 use common\models\business\BusinessClientCrm;
 use common\models\individual\IndividualClient;
 use common\traits\ActiveRecordTrait;
-use promocat\twofa\behaviors\TwoFaBehavior;
 use Yii;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
@@ -69,204 +68,114 @@ class User extends ActiveRecord implements IdentityInterface
         ];
     }
 
-    public function behaviors(): array
-    {
-        return array_merge(
-            parent::behaviors(),
-            [
-                'two_fa' => ['class' => TwoFaBehavior::class]
-            ]
-        );
-    }
+    // TwoFaBehavior removed — promocat/yii2-twofa not available on Packagist
+    // Re-enable when package is sourced or replaced with alternative 2FA
 
     /**
      * Finds user by user Id
-     * @param integer $id user identity
-     * @return static|null active record of user
      */
     public static function findIdentity($id)
     {
         return static::findOne(['id' => $id, 'status' => self::STATUS_ENABLED]);
     }
 
-    /**
-     * Finds user by email
-     * @param string $email the email to search
-     * @return static|null active record of user
-     */
     public static function findByEmail($email)
     {
         return static::findOne(['email' => $email, 'status' => self::STATUS_ENABLED]);
     }
 
-     /**
-     * Finds user by id
-     * @param string $id the email to search
-     * @return static|null active record of user
-     */
     public static function findById($userId)
     {
         return static::findOne(['id' => $userId, 'status' => self::STATUS_ENABLED]);
     }
 
-    /**
-     * Finds user by username
-     * @param string $username the username to search
-     * @return static|null active record of user
-     */
     public static function findByUsername($username)
     {
         return static::findOne(['username' => $username, 'status' => self::STATUS_ENABLED]);
     }
 
-    /**
-     * Finds user by authentication token
-     * @param string $token user authentication token
-     * @param string $type type of user
-     * @return static|null active record of user
-     */
     public static function findIdentityByAccessToken($token, $type = null)
     {
         return static::findOne(['auth_key' => $token, 'status' => self::STATUS_ACTIVATED]);
     }
 
-    /**
-     * Finds user by password reset token
-     * @param string $token password reset token
-     * @return static|null active record of user
-     */
     public static function findByPasswordResetToken($token)
     {
         if (!static::isPasswordResetTokenValid($token)) {
             return null;
         }
-
         return static::findOne([
             'password_reset_token' => $token,
             'status' => self::STATUS_ENABLED,
         ]);
     }
 
-    /**
-     * Finds out if password reset token is valid
-     * @param string $token password reset token
-     * @return boolean if password token is valid or otherwise
-     */
     public static function isPasswordResetTokenValid($token)
     {
         if (empty($token)) {
             return false;
         }
-
         $expire = Yii::$app->params['user.passwordResetTokenExpire'];
         $parts = explode('_', $token);
         $timestamp = (int)end($parts);
-
         return $timestamp + $expire >= time();
     }
 
-    /**
-     * Gets the user id
-     * @return int current user Id
-     */
     public function getId()
     {
         return $this->id;
     }
 
-    /**
-     * Gets authentication token
-     * @return string $auth_key authentication key
-     */
     public function getAuthKey()
     {
         return $this->auth_key;
     }
 
-    /**
-     * Validates authentication key
-     * @param string $authKey the authentication key to validate
-     * @return boolean if authentication key is valid or otherwise
-     */
     public function validateAuthKey($authKey)
     {
         return $this->getAuthKey() === $authKey;
     }
 
-    /**
-     * Validates password
-     * @param string $password password to validate
-     * @return boolean if password provided is valid for current user
-     */
     public function validatePassword($password)
     {
         return Yii::$app->security->validatePassword($password, $this->password_hash);
     }
 
-    /**
-     * Generates password hash from password and sets it to the model
-     * @param string $password
-     */
     public function setPassword($password)
     {
         $this->password_hash = Yii::$app->security->generatePasswordHash($password);
     }
 
-    /**
-     * Set username
-     * @param string $username
-     */
     public function setUsername($username)
     {
         $this->email = $username;
     }
 
-    /**
-     * Set email
-     * @param string $email
-     */
     public function setEmail($email)
     {
         $this->email = $email;
     }
 
-    /**
-     * Set status
-     * @param string $status
-     */
     public function setStatus($status = self::STATUS_ENABLED)
     {
         $this->status = $status;
     }
 
-    /**
-     * Set business user flag
-     * $business_user variable
-     */
     public function setBusinessUser()
     {
         $this->business_user = self::TYPE_BUSINESS;
     }
 
-    /**
-     * Generates "remember me" authentication key
-     */
     public function generateAuthKey()
     {
         $this->auth_key = Yii::$app->security->generateRandomString();
     }
 
-    /**
-     * Generates new password reset token
-     */
     public function generatePasswordResetToken()
     {
         $this->password_reset_token = Yii::$app->security->generateRandomString() . '_' . time();
     }
 
-    /**
-     * Removes password reset token
-     */
     public function removePasswordResetToken()
     {
         $this->password_reset_token = null;
@@ -282,23 +191,22 @@ class User extends ActiveRecord implements IdentityInterface
         return $this->hasOne(BusinessClient::class, ['user_id' => 'id']);
     }
 
-    // check profile
     public function isTrialExpired(): bool
     {
-        if (!$this->client->trial_start) {
-            return true; // no trial info = expired
+        if (!$this->client || !$this->client->trial_start) {
+            return true;
         }
-
         $trialStart = new \DateTime($this->client->trial_start);
-        $trialEnd = (clone $trialStart)->modify('+2 months'); // calendar months
+        $trialEnd = (clone $trialStart)->modify('+2 months');
         $now = new \DateTime();
-
         return $now >= $trialEnd;
     }
 
     public function getClient()
     {
-        return $this->business_user !== self::TYPE_BUSINESS ? $this->individualClient : $this->businessClient;
+        return $this->business_user !== self::TYPE_BUSINESS
+            ? $this->individualClient
+            : $this->businessClient;
     }
 
     public function getCustomer()
@@ -306,17 +214,11 @@ class User extends ActiveRecord implements IdentityInterface
         return $this->hasOne(BusinessClientCrm::class, ['email' => 'email']);
     }
 
-    /**
-     * @return int|mixed
-     */
     public function getRewards()
     {
         return $this->getClient()->rewards;
     }
 
-    /**
-     * @return ?string
-     */
     public function hasTwoFaEnabled(): ?string
     {
         return $this->totp_secret;
