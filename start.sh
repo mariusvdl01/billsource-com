@@ -80,10 +80,14 @@ return [];
 PHPEOF
 fi
 
-# Set Apache to listen on Railway's $PORT (not the literal string $PORT)
+# Fix Apache MPM conflict at runtime
+# Disable conflicting MPMs, enable prefork (required for mod_php)
+a2dismod mpm_event mpm_worker 2>/dev/null || true
+a2enmod mpm_prefork 2>/dev/null || true
+
+# Set Apache to listen on Railway's PORT
 LISTEN_PORT="${PORT:-80}"
 echo "Configuring Apache on port ${LISTEN_PORT}"
-
 sed -i "s/Listen 80/Listen ${LISTEN_PORT}/" /etc/apache2/ports.conf
 sed -i "s/:80>/:${LISTEN_PORT}>/" /etc/apache2/sites-available/000-default.conf
 
