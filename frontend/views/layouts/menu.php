@@ -7,44 +7,47 @@ use yii\widgets\Menu;
 	    'items' => [
 	        [
 	        	'label' => 'Promotions', 
-	        	'url' => ['/default/home', 'tab' => 8],
+	        	'url' => ['/default/home', 'tab' => 'promotions'],
 	        ],
 	        [
 	        	'label' => 'Home', 
-	        	'url' => ['/default/home', 'tab' => 1],
+	        	'url' => ['/default/home', 'tab' => 'home'],
 	        ],
 	    	[
 	    		'label' => 'Billers', 
-	    		'url' => ['/default/home', 'tab' => 2],
+	    		'url' => ['/default/home', 'tab' => 'biller'],
 	    	],
 	    	[
 	    		'label' => 'Individuals', 
-	    		'url' => ['/default/home', 'tab' => 3],
+	    		'url' => ['/default/home', 'tab' => 'individual'],
 	    	],
 	    	[
 	    		'label' => 'Accountant',
-	    		'url' => ['default/home', 'tab' => 4],
+	    		'url' => ['default/home', 'tab' => 'bpo'],
 	    	],
-	    	/*[
-	    		'label' => 'VAS', 
-	    		'url' => ['default/home', 'tab' => 5],
-	    	],*/
 	    	[
 	    		'label' => 'Debt Rescue',
-	    		'url' => ['default/home', 'tab' => 6],
+	    		'url' => ['default/home', 'tab' => 'counsellor'],
 	    	],
 	    	[
 	    		'label' => 'FSP',
-	    		'url' => ['default/home', 'tab' => 7],
+	    		'url' => ['default/home', 'tab' => 'collector'],
+	    	],
+	    	[
+	    		'label' => 'Marketplace',
+	    		'url' => ['default/home', 'tab' => 'marketplace'],
+	    	],
+	    	[
+	    		'label' => 'Billi',
+	    		'url' => ['default/home', 'tab' => 'billi'],
 	    	],
 	    	[
 	    		'label' => 'Contact us', 
 	    		'url' => ['default/contact'],
 	    	],
 	    ],
-	    //'activeCssClass' => 'current',
 	    'options' => ['class' => 'nav nav-tabs hidden-xs', 'style' => 'border-bottom:none !important'],
-	    'labelTemplate' =>'{label}',
+	    'labelTemplate' => '{label}',
 	    'linkTemplate' => '<a href="{url}" class="bg-primary">{label}</a>',
 	]);
 ?>
