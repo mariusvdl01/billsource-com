@@ -31,6 +31,21 @@ RUN a2dismod mpm_event mpm_worker || true \
 RUN sed -i 's|AllowOverride None|AllowOverride All|g' \
     /etc/apache2/apache2.conf
 
+# Fix directory permissions for Apache (www-data)
+RUN mkdir -p /var/www/html/assets \
+    && mkdir -p /var/www/html/var/runtime/pdf \
+    && mkdir -p /var/www/html/var/runtime/logs \
+    && mkdir -p /var/www/html/frontend/runtime \
+    && mkdir -p /var/www/html/frontend/web/assets \
+    && chown -R www-data:www-data /var/www/html/assets \
+    && chown -R www-data:www-data /var/www/html/var \
+    && chown -R www-data:www-data /var/www/html/frontend/runtime \
+    && chown -R www-data:www-data /var/www/html/frontend/web/assets \
+    && chmod -R 775 /var/www/html/assets \
+    && chmod -R 775 /var/www/html/var \
+    && chmod -R 775 /var/www/html/frontend/runtime \
+    && chmod -R 775 /var/www/html/frontend/web/assets
+
 COPY start.sh /usr/local/bin/start.sh
 RUN chmod +x /usr/local/bin/start.sh
 
